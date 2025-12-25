@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   />
-  <title>Neon Dash (Geometry-Dash-style)</title>
+  <title>Neon Dash (LukeNguyen109)</title>
 
   <style>
     /* =============================================================================
@@ -574,6 +574,38 @@
             </div>
         </div>
 
+        <!-- Speed ramp menu (MENU + GAMEOVER) -->
+        <div id="speedPanel" class="musicBox">
+          <div class="musicLabel">Speed</div>
+
+        <div class="musicRow">
+          <input
+            id="speedSlider"
+            type="range"
+            min="0"
+            max="20"
+            step="0.5"
+            value="5.5"
+            class="select"
+            style="padding: 0 10px;"
+          />
+
+          <span
+            id="speedValue"
+            class="tag"
+            style="min-width:48px; text-align:center;"
+          >
+            5.5
+          </span>
+
+          <button id="btnSpeedReset" class="btn">Reset</button>
+        </div>
+
+          <div class="hintLine" style="margin-top:8px;">
+            Higher = difficulty increases faster.
+          </div>
+        </div>
+
         <div class="hintLine">
             Jump: Space / Up / Click / Tap<br/>
             Restart: R (or tap after death)<br/>
@@ -620,6 +652,15 @@
 
     const btnPreview =
         document.getElementById("btnPreview");
+
+    const speedSlider =
+      document.getElementById("speedSlider");
+
+    const btnSpeedReset =
+      document.getElementById("btnSpeedReset");
+
+    const speedValue =
+      document.getElementById("speedValue");
 
     const canvas =
       document.getElementById("game");
@@ -739,23 +780,23 @@
 
       // Difficulty curve
       baseSpeed:
-        560,            // px/s
+        500,            // px/s
 
       maxSpeed:
         980,            // px/s
 
       speedRampPerSec:
-        10.5,           // px/s per second
+        5.5,           // px/s per second
 
       // Spawn control
       spawnAhead:
         1200,           // how far ahead we ensure spawns exist (world units)
 
       minGap:
-        240,            // minimum pattern gap
+        350,            // minimum pattern gap
 
       maxGap:
-        520,            // maximum pattern gap
+        600,            // maximum pattern gap
 
       // Obstacle sizes
       spikeWidth:
@@ -1496,7 +1537,12 @@
         { id: "synth", name: "Built-in Synth (default)", type: "synth" },
         
         // Options for custom .mp3 files:
-        { id: "1", name: "Mua Doi Cho Remix", type: "file", url: "./static/mua_doi_cho_remix.mp3" },
+        { id: "1", name: "Mưa Đợi Chờ Remix - 9.5", type: "file", url: "./static/mua_doi_cho_remix.mp3" },
+        { id: "2", name: "Hẹn Hò Nhưng Không Yêu Remix - 9.5", type: "file", url: "./static/hen_ho_nhung_k_iu.mp3" },
+        { id: "3", name: "Anh Vui Drill - 9.5", type: "file", url: "./static/anh_vui.mp3" },
+        { id: "4", name: "Đổi Tình Đổi Áo Remix - 9.5", type: "file", url: "./static/doi_tinh_doi_ao.mp3" },
+        { id: "5", name: "Trả Cho Anh Remix Huy PT - 9.5", type: "file", url: "./static/tra_cho_anh_huypt.mp3" },
+        { id: "6", name: "Trả Cho Anh Remix NESS - 9.5", type: "file", url: "./static/tra_cho_anh_ness.mp3" },
         // { id: "t2", name: "My Track 2", type: "file", url: "./static/track2.mp3" },
 
         { id: "off",   name: "Off",                     type: "off"   },
@@ -1556,6 +1602,53 @@
     }
 
     initMusicMenu();
+
+    function initSpeedMenu()
+    {
+      const key = "neon_dash_speedRamp";
+
+      const saved =
+        parseFloat(localStorage.getItem(key));
+
+      if (!isNaN(saved))
+      {
+        CONFIG.speedRampPerSec = saved;
+      }
+
+      // sync UI
+      speedSlider.value =
+        CONFIG.speedRampPerSec;
+
+      speedValue.textContent =
+        CONFIG.speedRampPerSec.toFixed(1);
+
+      // live update while dragging
+      speedSlider.addEventListener("input", () =>
+      {
+        const v =
+          parseFloat(speedSlider.value);
+
+        CONFIG.speedRampPerSec = v;
+        speedValue.textContent = v.toFixed(1);
+
+        localStorage.setItem(key, String(v));
+      });
+
+      // reset button
+      btnSpeedReset.addEventListener("click", () =>
+      {
+        const def = 5.5;
+
+        CONFIG.speedRampPerSec = def;
+        speedSlider.value = def;
+        speedValue.textContent = def.toFixed(1);
+
+        localStorage.setItem(key, String(def));
+      });
+    }
+
+
+    initSpeedMenu();
 
     /* =============================================================================
        Input handling
