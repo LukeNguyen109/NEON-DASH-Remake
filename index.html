@@ -6,7 +6,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   />
-  <title>Neon Dash (LukeNguyen109)</title>
+  <title>Neon Dash || LukeNguyen109</title>
 
   <style>
     /* =============================================================================
@@ -504,7 +504,178 @@
         font-size: 16px;
       }
     }
-  </style>
+  
+    /* =============================================================================
+       BEST SCORE panel (GAME OVER only)
+       Pixel-ish, white→gold gradient + flame wings outline
+       ============================================================================= */
+    .bestScorePanel{
+      position: relative;
+      margin-top: 14px;
+      padding: 12px 12px;
+      border: 2px solid rgba(255, 220, 140, 0.65);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,205,100,0.12)),
+        radial-gradient(120% 120% at 50% 0%, rgba(255,220,140,0.16), rgba(0,0,0,0) 60%);
+      box-shadow:
+        0 0 0 2px rgba(0,0,0,0.35) inset,
+        0 10px 30px rgba(0,0,0,0.45);
+      border-radius: 10px;
+      transform: translateZ(0);
+      overflow: visible;
+    }
+
+    .bestScorePanel.hidden{ display:none; }
+
+    /* Corner badge PNG (top-right, 45° tilt) */
+    .bestScoreBadge{
+      position: absolute;
+      top: var(--badgeTop);
+      left: var(--badgeLeft);
+      width: 86px;
+      height: auto;
+      transform:
+        translate(var(--badgeTx), var(--badgeTy))
+        rotate(var(--badgeRot))
+        scale(var(--badgeScale));
+      transform-origin: 50% 50%;
+      pointer-events: none;
+      image-rendering: pixelated;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
+      opacity: 0.98;
+      
+      --badgeTop: -30px;     /* down +, up - */
+      --badgeLeft: 225px;    /* right +, left - */
+      --badgeTx: 0px;
+      --badgeTy: 0px;
+      --badgeRot: 0deg;
+      --badgeScale: 1;
+
+    }
+    @media (max-width: 520px){
+      .bestScoreBadge{
+        width: 70px;
+        top: -14px;
+        right: -14px;
+      }
+    }
+
+
+    .bestScoreInner{
+      position: relative;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.02) 0px,
+          rgba(255,255,255,0.02) 6px,
+          rgba(255,255,255,0.00) 6px,
+          rgba(255,255,255,0.00) 12px
+        );
+      border-radius: 8px;
+      padding: 10px 10px;
+    }
+
+    .bestScoreTitle{
+      font-weight: 900;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      font-size: 0.92rem;
+      background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,214,125,0.98));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 0 0 rgba(0,0,0,0.0),
+        0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    .bestScoreValue{
+      margin-top: 2px;
+      font-weight: 1000;
+      font-size: 2.05rem;
+      line-height: 1.0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,196,80,0.98));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow:
+        0 2px 0 rgba(0,0,0,0.45),
+        0 0 18px rgba(255, 200, 90, 0.20);
+    }
+
+    /* Flame wing outline (pixel-y steps via repeating gradients) */
+    .bestScoreWings{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width: calc(100% + 62px);
+      height: calc(100% + 22px);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.35));
+    }
+    .bestScoreWings::before,
+    .bestScoreWings::after{
+      content:"";
+      position:absolute;
+      top: 50%;
+      width: 46px;
+      height: 46px;
+      transform: translateY(-50%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,205,100,0.55)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.10) 0px,
+          rgba(255,255,255,0.10) 4px,
+          rgba(255,255,255,0.00) 4px,
+          rgba(255,255,255,0.00) 8px
+        );
+      border: 2px solid rgba(255, 220, 140, 0.65);
+      box-shadow: 0 0 0 2px rgba(0,0,0,0.35) inset;
+      /* jagged, flame-wing-ish silhouette */
+      clip-path: polygon(0% 55%, 10% 35%, 25% 45%, 35% 25%, 52% 42%, 64% 18%, 82% 38%, 100% 50%, 82% 62%, 64% 82%, 52% 58%, 35% 75%, 25% 55%, 10% 68%);
+    }
+    .bestScoreWings::before{ left: 0; }
+    .bestScoreWings::after{ right: 0; transform: translateY(-50%) scaleX(-1); }
+
+    /* Show animation (rare + prestigious) */
+    .bestScorePanel.show{
+      animation: bestPop 620ms cubic-bezier(.12,1.45,.22,1) both, bestShake 420ms ease-out 620ms 1;
+    }
+    .bestScorePanel.show .bestScoreWings::before,
+    .bestScorePanel.show .bestScoreWings::after{
+      animation: wingIgnite 850ms ease-out both;
+    }
+    .bestScorePanel.show .bestScoreValue{
+      animation: scoreFlicker 900ms ease-out both;
+    }
+
+    @keyframes bestPop{
+      0%   { transform: scale(0.70); opacity: 0; }
+      60%  { transform: scale(1.06); opacity: 1; }
+      100% { transform: scale(1.00); opacity: 1; }
+    }
+    @keyframes bestShake{
+      0%   { transform: scale(1.00) translateX(0px); }
+      20%  { transform: scale(1.00) translateX(-2px); }
+      40%  { transform: scale(1.00) translateX(2px); }
+      60%  { transform: scale(1.00) translateX(-1px); }
+      100% { transform: scale(1.00) translateX(0px); }
+    }
+    @keyframes wingIgnite{
+      0%   { opacity: 0; transform: translateY(-50%) scale(0.85); filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+      40%  { opacity: 1; transform: translateY(-50%) scale(1.03); filter: drop-shadow(0 0 18px rgba(255, 200, 90, 0.20)); }
+      100% { opacity: 1; transform: translateY(-50%) scale(1.00); filter: drop-shadow(0 0 12px rgba(255, 200, 90, 0.12)); }
+    }
+    @keyframes scoreFlicker{
+      0%   { text-shadow: 0 2px 0 rgba(0,0,0,0.45), 0 0 0 rgba(255,200,90,0.0); }
+      25%  { text-shadow: 0 2px 0 rgba(0,0,0,0.45), 0 0 26px rgba(255,200,90,0.30); }
+      55%  { text-shadow: 0 2px 0 rgba(0,0,0,0.45), 0 0 14px rgba(255,200,90,0.18); }
+      100% { text-shadow: 0 2px 0 rgba(0,0,0,0.45), 0 0 18px rgba(255,200,90,0.20); }
+    }
+</style>
 </head>
 
 <body>
@@ -518,6 +689,11 @@
         <div class="hudRow">
           <span>Score</span>
           <span id="uiScore">0</span>
+        </div>
+
+        <div class="hudRow">
+          <span>Last</span>
+          <span id="uiLast">0</span>
         </div>
 
         <div class="hudRow">
@@ -564,6 +740,17 @@
             Time your jumps. One hit = boom.
         </p>
 
+        <!-- Best score celebration (GAME OVER only, shown only on new best) -->
+        <div id="bestScorePanel" class="bestScorePanel hidden" aria-hidden="true">
+          <img id="bestScoreBadge" class="bestScoreBadge" src="./static/dk.png" alt="" aria-hidden="true" />
+          <div class="bestScoreWings" aria-hidden="true"></div>
+          <div class="bestScoreInner">
+            <div class="bestScoreTitle">BEST SCORE</div>
+            <div class="bestScoreValue" id="bestScoreValue">0</div>
+          </div>
+        </div>
+
+
         <!-- Music menu (MENU + GAMEOVER) -->
         <div id="musicPanel" class="musicBox">
             <div class="musicLabel">Music</div>
@@ -585,7 +772,7 @@
             min="0"
             max="20"
             step="0.5"
-            value="5.5"
+            value="10"
             class="select"
             style="padding: 0 10px;"
           />
@@ -671,6 +858,9 @@
     const uiScore =
       document.getElementById("uiScore");
 
+    const uiLast =
+      document.getElementById("uiLast");
+
     const uiBest =
       document.getElementById("uiBest");
 
@@ -691,6 +881,15 @@
 
     const panelText =
       document.getElementById("panelText");
+
+    const bestScorePanel =
+      document.getElementById("bestScorePanel");
+
+    const bestScoreValueEl =
+      document.getElementById("bestScoreValue");
+
+    const bestScoreBadgeEl =
+      document.getElementById("bestScoreBadge");
 
     const btnStart =
       document.getElementById("btnStart");
@@ -756,7 +955,8 @@
         0.25,           // player's fixed screen X = width * playerXFrac
 
       gravity:
-        3400,           // px/s^2
+        // 3400,           // px/s^2
+        4500,
 
       jumpSpeed:
         1180,           // px/s (impulse)
@@ -780,30 +980,30 @@
 
       // Difficulty curve
       baseSpeed:
-        500,            // px/s
+        600,            // px/s
 
       maxSpeed:
-        980,            // px/s
+        1500,            // px/s
 
       speedRampPerSec:
-        5.5,           // px/s per second
+        13,           // px/s per second
 
       // Spawn control
       spawnAhead:
         1200,           // how far ahead we ensure spawns exist (world units)
 
       minGap:
-        450,            // minimum pattern gap
+        625,            // minimum pattern gap
 
       maxGap:
-        700,            // maximum pattern gap
+        1050,            // maximum pattern gap
 
       // Obstacle sizes
       spikeWidth:
         44,
 
       spikeHeight:
-        42,
+        46,
 
       blockMin:
         44,
@@ -812,8 +1012,8 @@
         68,
 
       // Particles
-      trailRate:
-        70,             // per second
+      trailRate: //number of trail particles per second
+        100,             // per second
 
       deathParticles:
         95,
@@ -832,7 +1032,7 @@
 
       // Beat pulse (visual + music)
       bpm:
-        138,
+        144,
 
       // Fixed timestep
       fixedDt:
@@ -916,6 +1116,14 @@
         this.trackUrl = "";               // for file tracks
         this.previewing = false;
         this.fileMusicVolume = 0.55;
+
+        // One-shot MP3 SFX pool (checkpoint celebrations)
+        // Kept separate from WebAudio graph so it can use your ./static/*.mp3 files.
+        this._oneshotPool = new Map();
+
+        // New-best-score MP3 (blocks jump-to-restart while playing)
+        this._bestScoreSfx = null;
+        this._bestScoreSfxPlaying = false;
 
         this.master =
           null;
@@ -1134,6 +1342,11 @@
     if (this.musicEl)
     {
         this.musicEl.muted = this.muted;
+    }
+
+    if (this._bestScoreSfx)
+    {
+        this._bestScoreSfx.muted = this.muted;
     }
 
     btnMute.textContent =
@@ -1508,7 +1721,132 @@
         osc.start(time);
         osc.stop(time + 0.06);
       }
-    }
+    
+      playOneShotMp3(url, vol = 0.95)
+      {
+        if (!url) return;
+        if (this.muted) return;
+
+        let pool =
+          this._oneshotPool.get(url);
+
+        if (!pool)
+        {
+          pool = [];
+          this._oneshotPool.set(url, pool);
+        }
+
+        // try to reuse an idle element
+        let el =
+          null;
+
+        for (let i = 0; i < pool.length; i++)
+        {
+          const a = pool[i];
+          if (a.paused || a.ended)
+          {
+            el = a;
+            break;
+          }
+        }
+
+        if (!el)
+        {
+          el = new Audio(url);
+          el.preload = "auto";
+          pool.push(el);
+        }
+
+        el.muted =
+          this.muted;
+
+        el.volume =
+          clamp(vol, 0, 1);
+
+        try
+        {
+          el.currentTime = 0;
+        }
+        catch (e)
+        {
+          // ignore (can happen if not ready)
+        }
+
+        el.play().catch(() =>
+        {
+          // If the browser blocks it (no gesture yet), it'll work after unlock.
+        });
+      }
+
+
+
+      // New best score MP3 (HTMLAudioElement) — lets gameplay logic know when it is still playing.
+      playBestScoreMp3(url, vol = 0.95)
+      {
+        if (!url) return;
+        if (this.muted) return;
+
+        // stop any previous best-score jingle
+        this.stopBestScoreMp3();
+
+        const el = new Audio(url);
+        el.preload = "auto";
+        el.loop = false;
+        el.muted = this.muted;
+        el.volume = clamp(vol, 0, 1);
+
+        this._bestScoreSfx = el;
+        this._bestScoreSfxPlaying = true;
+
+        const clear = () =>
+        {
+          if (this._bestScoreSfx === el)
+          {
+            this._bestScoreSfx = null;
+            this._bestScoreSfxPlaying = false;
+          }
+        };
+
+        el.addEventListener("ended", clear, { once: true });
+
+        el.play().catch(() =>
+        {
+          // Autoplay block or load fail: don't lock input.
+          clear();
+        });
+      }
+
+      stopBestScoreMp3()
+      {
+        const el = this._bestScoreSfx;
+        this._bestScoreSfx = null;
+        this._bestScoreSfxPlaying = false;
+
+        if (!el) return;
+
+        try { el.pause(); } catch (e) {}
+        try { el.currentTime = 0; } catch (e) {}
+      }
+
+      isBestScoreMp3Playing()
+      {
+        return !!this._bestScoreSfxPlaying;
+      }
+
+      sfxCheckpoint(cp)
+      {
+        // Dedicated MP3 per milestone (matches your prompt).
+        const url =
+          (cp === 100) ? CHECKPOINT_SFX_URLS[100] :
+          (cp === 300) ? CHECKPOINT_SFX_URLS[300] :
+          (cp === 500) ? CHECKPOINT_SFX_URLS[500] :
+          (cp === 750) ? CHECKPOINT_SFX_URLS[750] :
+          CHECKPOINT_SFX_URLS[1000]; // 1000 and every +250 after 1000
+
+        this.playOneShotMp3(url, 0.95);
+      }
+
+}
 
     const audio =
       new AudioManager();
@@ -1537,12 +1875,13 @@
         { id: "synth", name: "Built-in Synth (default)", type: "synth" },
         
         // Options for custom .mp3 files:
-        { id: "1", name: "Mưa Đợi Chờ Remix - 9.5", type: "file", url: "./static/mua_doi_cho_remix.mp3" },
-        { id: "2", name: "Hẹn Hò Nhưng Không Yêu Remix - 9.5", type: "file", url: "./static/hen_ho_nhung_k_iu.mp3" },
-        { id: "3", name: "Anh Vui Drill - 9.5", type: "file", url: "./static/anh_vui.mp3" },
-        { id: "4", name: "Đổi Tình Đổi Áo Remix - 9.5", type: "file", url: "./static/doi_tinh_doi_ao.mp3" },
+        { id: "1", name: "Mưa Đợi Chờ Remix - 10.5", type: "file", url: "./static/mua_doi_cho_remix.mp3" },
+        { id: "2", name: "Hẹn Hò Nhưng Không Yêu Remix - 15", type: "file", url: "./static/hen_ho_nhung_k_iu.mp3" },
+        { id: "3", name: "Anh Vui Drill - 16.5", type: "file", url: "./static/anh_vui.mp3" },
+        { id: "4", name: "Đổi Tình Đổi Áo Remix - 7.5", type: "file", url: "./static/doi_tinh_doi_ao.mp3" },
         { id: "5", name: "Trả Cho Anh Remix Huy PT - 9.5", type: "file", url: "./static/tra_cho_anh_huypt.mp3" },
         { id: "6", name: "Trả Cho Anh Remix NESS - 11", type: "file", url: "./static/tra_cho_anh_ness.mp3" },
+        { id: "7", name: "Đổi Tình Đổi Áo Remix có lời - 13", type: "file", url: "./static/doi_tinh_doi_ao_remix2.MP3" },
         // { id: "t2", name: "My Track 2", type: "file", url: "./static/track2.mp3" },
 
         { id: "off",   name: "Off",                     type: "off"   },
@@ -2015,10 +2354,10 @@
         if (this.kind === "trail")
         {
           g.fillStyle =
-            `rgba(125, 249, 255, ${0.8 * a})`;
+            `rgba(125, 249, 255, ${1.25 * a})`; //intensity of each trail particle
 
           g.shadowBlur =
-            18 + 10 * pulse;
+            32 + 18 * pulse; //trail spread distance
 
           g.shadowColor =
             "rgba(125, 249, 255, 0.6)";
@@ -2477,7 +2816,7 @@
         }
       }
 
-      draw(g, pulse)
+      draw(g, pulse) 
       {
         const cx =
           this.x + this.size * 0.5;
@@ -3132,6 +3471,14 @@
     let milestone =
       0;
 
+    // score checkpoint celebration state
+    let checkpointTarget =
+      100;
+
+    // set to true when this run beats the stored best (used for GAME OVER celebration)
+    let newBestThisRun =
+      false;
+
     let shakeT =
       0;
 
@@ -3176,7 +3523,38 @@
       uiBest.textContent = bestScore.toString();
     }
 
+    let lastScore = 0;
+
+    function loadLast()
+    {
+      const v =
+        localStorage.getItem("neon_dash_last");
+
+      lastScore =
+        v ? parseInt(v, 10) : 0;
+
+      if (!Number.isFinite(lastScore)) lastScore = 0;
+
+      uiLast.textContent =
+        lastScore.toString();
+    }
+
+    function saveLast(v)
+    {
+      lastScore = v;
+
+      localStorage.setItem(
+        "neon_dash_last",
+        String(lastScore)
+      );
+
+      uiLast.textContent =
+        lastScore.toString();
+    }
+
     loadBest();
+    loadLast();
+
 
     /* =============================================================================
        Particle spawners
@@ -3228,6 +3606,468 @@
       }
     }
 
+
+    /* =============================================================================
+       Score celebrations (Checkpoint flames + Best-score prestige)
+       ============================================================================= */
+
+    // Fixed checkpoints (once per run). After 1000: every +250.
+    const CHECKPOINTS =
+      [100, 300, 500, 750, 1000];
+
+    const CHECKPOINT_SFX_URLS =
+    {
+      100: "./static/Apple_pay.mp3",
+      300: "./static/Apple_pay.mp3",
+      500: "./static/Apple_pay.mp3",
+      750: "./static/Apple_pay.mp3",
+      1000: "./static/Apple_pay.mp3",
+    };
+
+    // MP3 played when a new best score is achieved (GAME OVER screen)
+    const BEST_SCORE_SFX_URL = "./static/best_score.mp3";
+
+
+    const CHECKPOINT_PALETTES =
+    {
+      100: { outer: "#ff4f1a", mid: "#ffb300", inner: "#fff3c2", glow: "#ffd36b" },
+      300: { outer: "#ff1f7b", mid: "#ff6ad5", inner: "#fff0fb", glow: "#ff9be6" },
+      500: { outer: "#00b8ff", mid: "#63f6ff", inner: "#e9feff", glow: "#9efcff" },
+      750: { outer: "#20ff6b", mid: "#9effb9", inner: "#eafff0", glow: "#b7ffd1" },
+      1000:{ outer: "#ffb000", mid: "#ffe066", inner: "#fff6d6", glow: "#fff0a8" },
+    };
+
+    function hexToRgb(hex)
+    {
+      const h = hex.replace("#", "");
+      const n = parseInt(h.length === 3 ? h.split("").map(c => c + c).join("") : h, 16);
+      return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+    }
+
+    function rgbToHex(r, g, b)
+    {
+      const to = (v) => v.toString(16).padStart(2, "0");
+      return "#" + to(r) + to(g) + to(b);
+    }
+
+    function shadeHex(hex, amt)
+    {
+      // amt in [-1..1] (negative = darker, positive = lighter)
+      const c = hexToRgb(hex);
+      const t = amt >= 0 ? 255 : 0;
+      const p = Math.min(1, Math.abs(amt));
+      const r = Math.round(c.r + (t - c.r) * p);
+      const g = Math.round(c.g + (t - c.g) * p);
+      const b = Math.round(c.b + (t - c.b) * p);
+      return rgbToHex(r, g, b);
+    }
+
+    function jitterPalette(pal)
+    {
+      const j = rand(-0.10, 0.14);
+      return {
+        outer: shadeHex(pal.outer, j),
+        mid: shadeHex(pal.mid, j * 0.6),
+        inner: shadeHex(pal.inner, j * 0.35),
+        glow: shadeHex(pal.glow, j * 0.55),
+      };
+    }
+
+    function nextCheckpointValue(cp)
+    {
+      const idx = CHECKPOINTS.indexOf(cp);
+      if (idx !== -1 && idx < CHECKPOINTS.length - 1)
+      {
+        return CHECKPOINTS[idx + 1];
+      }
+
+      // After 1000: every 250
+      if (cp >= 1000) return cp + 250;
+
+      // fallback
+      return 1000;
+    }
+
+    function easeOutBack(x)
+    {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    }
+
+    function easeOutCubic(x)
+    {
+      return 1 - Math.pow(1 - x, 3);
+    }
+
+    function pixelText(ctx, txt, x, y, size, fillA, fillB, alpha)
+    {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // "pixel-ish" outline by stamping 4 directions
+      ctx.font =
+        `900 ${size}px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.fillStyle = "rgba(0,0,0,0.55)";
+      ctx.fillText(txt, x - 2, y);
+      ctx.fillText(txt, x + 2, y);
+      ctx.fillText(txt, x, y - 2);
+      ctx.fillText(txt, x, y + 2);
+
+      // gradient fill (white→goldy) but still "arcade"
+      const g = ctx.createLinearGradient(x - 60, y - 18, x + 60, y + 18);
+      g.addColorStop(0, fillA);
+      g.addColorStop(1, fillB);
+
+      ctx.fillStyle = g;
+      ctx.fillText(txt, x, y);
+
+      ctx.restore();
+    }
+
+    class FlameParticle
+    {
+      constructor(x, y, vx, vy, life, size, col)
+      {
+        this.x = x; this.y = y;
+        this.vx = vx; this.vy = vy;
+        this.life = life;
+        this.t = 0;
+        this.size = size;
+        this.col = col;
+      }
+
+      update(dt)
+      {
+        this.t += dt;
+        // slightly float + drag
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.vx *= Math.pow(0.12, dt);
+        this.vy *= Math.pow(0.22, dt);
+        this.vy -= 18 * dt; // keep rising
+      }
+
+      draw(ctx)
+      {
+        const p = clamp(this.t / this.life, 0, 1);
+        const a = (1 - p) * (1 - p);
+        const s = this.size;
+
+        ctx.globalAlpha = a;
+        ctx.fillStyle = this.col;
+        ctx.fillRect(Math.round(this.x - s * 0.5), Math.round(this.y - s * 0.5), s, s);
+      }
+
+      alive()
+      {
+        return this.t < this.life;
+      }
+    }
+
+    class CheckpointBurst
+    {
+      constructor(scoreValue, intensity, palette, duration)
+      {
+        this.scoreValue = scoreValue;
+        this.intensity = intensity;
+        this.palette = palette;
+        this.duration = duration;
+
+        this.t = 0;
+        this.seed = rand(0, 99999);
+
+        // anchor near top-centre; keep clear of HUD
+        this.x = W * 0.5;
+        this.y = Math.max(250, 14 + 86); //position of the flame effect
+
+        this.particles = [];
+
+        const baseCount = Math.floor(26 + 50 * intensity);
+        for (let i = 0; i < baseCount; i++)
+        {
+          this.spawnParticle(0, 0, true);
+        }
+      }
+
+      spawnParticle(dx, dy, fast)
+      {
+        const sp = fast ? rand(80, 220) : rand(30, 140);
+        const ang = rand(-Math.PI * 0.85, -Math.PI * 0.15);
+        const vx = Math.cos(ang) * sp * rand(0.35, 1.0);
+        const vy = Math.sin(ang) * sp * rand(0.55, 1.0);
+
+        const col = rand() < 0.55 ? this.palette.mid : this.palette.glow;
+        const size = rand(2, 4) + Math.floor(this.intensity);
+        const life = rand(0.35, 0.85) + this.intensity * 0.12;
+
+        this.particles.push(
+          new FlameParticle(
+            this.x + dx,
+            this.y + dy,
+            vx,
+            vy,
+            life,
+            size,
+            col
+          )
+        );
+      }
+
+      update(dt)
+      {
+        this.t += dt;
+
+        // keep spawning a few flicker sparks early
+        if (this.t < this.duration * 0.45 && rand() < 0.45)
+        {
+          const w = 18 + 10 * this.intensity;
+          this.spawnParticle(rand(-w, w), rand(-10, 6), false);
+        }
+
+        for (let i = this.particles.length - 1; i >= 0; i--)
+        {
+          this.particles[i].update(dt);
+          if (!this.particles[i].alive()) this.particles.splice(i, 1);
+        }
+      }
+
+      draw(ctx)
+      {
+        const p = clamp(this.t / this.duration, 0, 1);
+
+        const pop = easeOutBack(clamp(p / 0.18, 0, 1));
+        const fade = 1 - clamp((p - 0.72) / 0.28, 0, 1);
+
+        const lift = -30 * easeOutCubic(p);
+        const wobble = Math.sin(this.t * (10 + 3 * this.intensity) + this.seed) * (2 + 1.2 * this.intensity);
+
+        const scale = (0.92 + 0.40 * pop) * (1 + 0.02 * wobble); // overall scale
+
+        const px = 3; // pixel step
+
+        ctx.save();
+        ctx.globalAlpha = fade;
+
+        // subtle glow bloom (still pixel-y)
+        ctx.globalAlpha = fade * 0.22;
+        ctx.fillStyle = this.palette.glow;
+        const glowW = (110 + 48 * this.intensity);
+        ctx.fillRect(
+          Math.round(this.x - glowW * 0.5),
+          Math.round(this.y - 64 + lift),
+          Math.round(glowW),
+          Math.round(18)
+        );
+
+        ctx.globalAlpha = fade;
+
+        // flame columns
+        ctx.save();
+        ctx.translate(Math.round(this.x), Math.round(this.y + lift));
+        ctx.scale(scale, scale);
+
+        // base dimensions
+        const baseW = 120 + 70 * this.intensity;
+        const baseH = 62  + 34 * this.intensity;
+
+        const cols = Math.floor(baseW / px);
+        const half = cols * 0.5;
+
+        for (let i = 0; i < cols; i++)
+        {
+          const x = (i - half) * px;
+
+          // flame height with flicker
+          const n = (Math.sin((i * 0.55) + this.t * (18 + 2 * this.intensity) + this.seed) + 1) * 0.5;
+          const edge = 1 - Math.abs((i - half) / half);
+          const h = (baseH * (0.26 + 0.86 * n) * (0.55 + 0.45 * edge)) * (1 - 0.18 * p);
+
+          const h1 = Math.max(6, h);
+          const h2 = Math.max(4, h * 0.72);
+          const h3 = Math.max(3, h * 0.48);
+
+          // outer
+          ctx.fillStyle = this.palette.outer;
+          ctx.fillRect(Math.round(x), 0, px, -Math.round(h1));
+
+          // mid
+          ctx.fillStyle = this.palette.mid;
+          ctx.fillRect(Math.round(x), 0, px, -Math.round(h2));
+
+          // inner (leave gaps so it feels like pixels)
+          if (i % 2 === 0)
+          {
+            ctx.fillStyle = this.palette.inner;
+            ctx.fillRect(Math.round(x), 0, px, -Math.round(h3));
+          }
+        }
+
+        // a few bright "embers" on top
+        ctx.fillStyle = this.palette.glow;
+        for (let k = 0; k < 14 + 8 * this.intensity; k++)
+        {
+          const ex = rand(-baseW * 0.45, baseW * 0.45);
+          const ey = -rand(baseH * 0.25, baseH * 1.05);
+          if (rand() < 0.6) ctx.fillRect(Math.round(ex), Math.round(ey), px, px);
+        }
+
+        // text (on top of flame)
+        const label = `${this.scoreValue}!`;
+        pixelText(ctx, label, 0, -baseH - 15, 34 + Math.floor(7 * this.intensity), "#ffffff", this.palette.glow, 1);
+
+        ctx.restore();
+
+        // particles (screen space)
+        for (let i = 0; i < this.particles.length; i++)
+        {
+          this.particles[i].draw(ctx);
+        }
+
+        ctx.restore();
+      }
+
+      alive()
+      {
+        return this.t < this.duration || this.particles.length > 0;
+      }
+    }
+
+    class BestScoreBurst
+    {
+      constructor()
+      {
+        this.t = 0;
+        this.duration = 2.6;
+
+        this.particles = [];
+
+        // centre-ish; behind overlay panel
+        this.x = W * 0.5;
+        this.y = H * 0.42;
+
+        for (let i = 0; i < 160; i++)
+        {
+          const ang = rand(0, Math.PI * 2);
+          const sp = rand(70, 260);
+          const vx = Math.cos(ang) * sp;
+          const vy = Math.sin(ang) * sp;
+
+          const life = rand(0.6, 1.35);
+          const size = rand(2, 4);
+          const col = rand() < 0.5 ? "#ffe066" : "#fff6d6";
+
+          this.particles.push(new FlameParticle(this.x, this.y, vx, vy, life, size, col));
+        }
+      }
+
+      update(dt)
+      {
+        this.t += dt;
+        for (let i = this.particles.length - 1; i >= 0; i--)
+        {
+          this.particles[i].update(dt);
+          if (!this.particles[i].alive()) this.particles.splice(i, 1);
+        }
+      }
+
+      draw(ctx)
+      {
+        const p = clamp(this.t / this.duration, 0, 1);
+        const a = 1 - p;
+
+        ctx.save();
+        ctx.globalAlpha = a * 0.18;
+        ctx.fillStyle = "#ffe066";
+        ctx.fillRect(Math.round(this.x - 220), Math.round(this.y - 90), 440, 130);
+
+        ctx.globalAlpha = a;
+        for (let i = 0; i < this.particles.length; i++)
+        {
+          this.particles[i].draw(ctx);
+        }
+
+        ctx.restore();
+      }
+
+      alive()
+      {
+        return this.t < this.duration || this.particles.length > 0;
+      }
+    }
+
+    class CelebrationSystem
+    {
+      constructor()
+      {
+        this.active =
+          [];
+      }
+
+      reset()
+      {
+        this.active.length = 0;
+      }
+
+      spawnCheckpoint(cp)
+      {
+        let pal =
+          CHECKPOINT_PALETTES[cp];
+
+        // After 1000: randomised colours, still consistent with palette
+        if (!pal)
+        {
+          const keys = Object.keys(CHECKPOINT_PALETTES);
+          const pick = CHECKPOINT_PALETTES[keys[Math.floor(rand(0, keys.length))]];
+          pal = jitterPalette(pick);
+        }
+
+        const intensity =
+          cp <= 1000
+            ? clamp(0.95 + cp / 520, 0.95, 2.55)
+            : clamp(2.05 + (cp - 1000) / 2200, 2.05, 3.20);
+
+        const duration =
+          cp < 300 ? 0.95
+            : cp < 750 ? 1.10
+            : cp < 1000 ? 1.22
+            : 1.30;
+
+        this.active.push(
+          new CheckpointBurst(cp, intensity, pal, duration)
+        );
+      }
+
+      spawnBestScore()
+      {
+        this.active.push(new BestScoreBurst());
+      }
+
+      update(dt)
+      {
+        for (let i = this.active.length - 1; i >= 0; i--)
+        {
+          this.active[i].update(dt);
+          if (!this.active[i].alive()) this.active.splice(i, 1);
+        }
+      }
+
+      draw(ctx)
+      {
+        for (let i = 0; i < this.active.length; i++)
+        {
+          this.active[i].draw(ctx);
+        }
+      }
+    }
+
+    const celebrations =
+      new CelebrationSystem();
+
     /* =============================================================================
        State transitions
        ============================================================================= */
@@ -3235,6 +4075,11 @@
     function setState(next)
     {
       state = next;
+
+      // default: hide best-score panel; we'll enable it on GAMEOVER if this run beats bestScore
+      bestScorePanel.classList.add("hidden");
+      bestScorePanel.classList.remove("show");
+      bestScorePanel.setAttribute("aria-hidden", "true");
 
       uiState.textContent =
         next;
@@ -3281,11 +4126,30 @@
         panelText.innerHTML =
             `Score: <b>${Math.floor(score)}</b><br/>Best: <b>${bestScore}</b><br/>Press <b>R</b> or <b>Tap</b> to restart.`;
 
+        // BEST SCORE celebration (rare + prestigious)
+        if (newBestThisRun)
+        {
+          bestScoreValueEl.textContent =
+            String(bestScore);
+
+          bestScorePanel.classList.remove("hidden");
+          bestScorePanel.setAttribute("aria-hidden", "false");
+
+          // restart CSS animation
+          bestScorePanel.classList.remove("show");
+          void bestScorePanel.offsetWidth;
+          bestScorePanel.classList.add("show");
+
+          // play new-best-score MP3 (blocks jump-to-restart until it finishes; Restart/R can skip)
+          audio.playBestScoreMp3(BEST_SCORE_SFX_URL, 0.95);
+        }
+
         // show music settings on defeat page too
         musicPanel.style.display = "block";
         btnPreview.textContent = "Preview";
 
         audio.stopMusic();
+        resetBestScoreBadgeAnim();
     }
     }
 
@@ -3299,6 +4163,8 @@
 
     function restartRun()
     {
+      // stop any best-score jingle so Restart can skip it
+      audio.stopBestScoreMp3();
       // reset everything
       obstacles.length = 0;
       particles.length = 0;
@@ -3312,6 +4178,14 @@
 
       score = 0;
       milestone = 0;
+
+      checkpointTarget =
+        100;
+
+      newBestThisRun =
+        false;
+
+      celebrations.reset();
 
       shakeT = 0;
       shakeMag = 0;
@@ -3357,22 +4231,159 @@
       const final =
         Math.floor(score);
 
-      if (final > bestScore)
+      saveLast(final);
+
+      newBestThisRun =
+        final > bestScore;
+
+      if (newBestThisRun)
       {
         bestScore = final;
         saveBest();
+
+        // prestigious sparkle burst behind the GAME OVER panel
+        celebrations.spawnBestScore();
       }
 
       setState(STATE.GAMEOVER);
     }
 
+    // =============================================================================
+    // Best-score crown zoom (only while best-score MP3 is playing)
+    // =============================================================================
+    let badgePulseTime = 0;
+    let badgeCycle = 0;
+
+    let badgeBaseScale = 1;       // grows every pulse
+    let badgeScale = 1;           // actual applied scale
+
+    let badgeWasPlaying = false;
+
+    // smooth settle when MP3 ends (or user skips via Restart)
+    let badgeSettleT = 0;
+    let badgeSettleFrom = 1;
+    let badgeSettleTo = 1;
+    const badgeSettleDur = 0.32;  // seconds
+
+    // tuning
+    const BADGE_PULSES_PER_SEC = 2.4;  // pulses per second
+    const BADGE_PULSE_AMP = 0.18;      // pulse strength
+    const BADGE_GROW_PER_PULSE = 0.04; // growth added each completed pulse
+
+    function badgeApplyScale(s)
+    {
+      if (!bestScoreBadgeEl) return;
+      bestScoreBadgeEl.style.setProperty("--badgeScale", String(s));
+    }
+
+    function easeInOutSmooth(t)
+    {
+      // smoothstep
+      return t * t * (3 - 2 * t);
+    }
+
+    function easeOutCubic(t)
+    {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function resetBestScoreBadgeAnim()
+    {
+      badgePulseTime = 0;
+      badgeCycle = 0;
+      badgeBaseScale = 1;
+      badgeScale = 1;
+      badgeWasPlaying = false;
+
+      badgeSettleT = 0;
+      badgeSettleFrom = 1;
+      badgeSettleTo = 1;
+
+      badgeApplyScale(1);
+    }
+
+    function updateBestScoreBadgeAnim(dt)
+    {
+      if (!bestScoreBadgeEl) return;
+
+      // Only animate when the best-score panel is visible
+      const panelVisible = !bestScorePanel.classList.contains("hidden");
+      if (!panelVisible)
+      {
+        resetBestScoreBadgeAnim();
+        return;
+      }
+
+      // This MUST match your audio manager function name:
+      const playing = audio.isBestScoreMp3Playing();
+
+      if (playing)
+      {
+        // advance pulse timer
+        badgePulseTime += dt;
+
+        // number of cycles completed
+        const cyclesFloat = badgePulseTime * BADGE_PULSES_PER_SEC;
+        const cyclesNow = Math.floor(cyclesFloat);
+
+        // each completed cycle grows the base scale
+        while (badgeCycle < cyclesNow)
+        {
+          badgeCycle++;
+          badgeBaseScale += BADGE_GROW_PER_PULSE;
+        }
+
+        // phase 0..1 within current cycle
+        const phase = cyclesFloat - cyclesNow;
+
+        // triangle wave (0..1..0)
+        let tri = phase < 0.5 ? (phase / 0.5) : ((1 - phase) / 0.5);
+        tri = easeInOutSmooth(tri);
+
+        // zoom around a growing base
+        badgeScale = badgeBaseScale * (1 + BADGE_PULSE_AMP * tri);
+
+        badgeApplyScale(badgeScale);
+
+        // cancel any settling
+        badgeSettleT = 0;
+        badgeWasPlaying = true;
+        return;
+      }
+
+      // if MP3 JUST stopped: smoothly settle to the final "zoom peak"
+      if (badgeWasPlaying)
+      {
+        badgeWasPlaying = false;
+        badgeSettleT = 0;
+
+        badgeSettleFrom = badgeScale;
+        badgeSettleTo = badgeBaseScale * (1 + BADGE_PULSE_AMP); // peak
+
+        return;
+      }
+
+      // settle in progress
+      if (badgeSettleT < badgeSettleDur)
+      {
+        badgeSettleT += dt;
+        const t = Math.min(1, badgeSettleT / badgeSettleDur);
+        const e = easeOutCubic(t);
+
+        const s = badgeSettleFrom + (badgeSettleTo - badgeSettleFrom) * e;
+        badgeScale = s;
+        badgeApplyScale(s);
+      }
+    }
     /* =============================================================================
        Main update (fixed timestep)
        ============================================================================= */
-
     function update(dt)
     {
       worldTime += dt;
+
+      // update celebration FX (also runs in MENU/GAMEOVER so animations can finish)
+      celebrations.update(dt);
 
       // UI timers
       if (toastTimer > 0)
@@ -3413,7 +4424,13 @@
         // allow tap to restart after deathF
         if (state === STATE.GAMEOVER)
         {
-          if (input.jumpPressed || input.restartPressed)
+          updateBestScoreBadgeAnim(dt);
+          const blockJump =
+            audio.isBestScoreMp3Playing();
+
+          // While the new-best MP3 is playing, ignore jump-to-restart.
+          // "Restart" (R/button) still works and will skip the MP3.
+          if (input.restartPressed || (input.jumpPressed && !blockJump))
           {
             restartRun();
           }
@@ -3444,14 +4461,18 @@
       score +=
         worldSpeed * dt * CONFIG.scorePerUnit;
 
-      // milestone tick every 100 points
-      const ms =
-        Math.floor(score / 100);
+      // checkpoint celebrations:
+      // 100 / 300 / 500 / 750 / 1000 (once per run), then every +250 after 1000
+      const scoreInt =
+        Math.floor(score);
 
-      if (ms > milestone)
+      while (scoreInt >= checkpointTarget)
       {
-        milestone = ms;
-        audio.sfxTick();
+        celebrations.spawnCheckpoint(checkpointTarget);
+        audio.sfxCheckpoint(checkpointTarget);
+
+        checkpointTarget =
+          nextCheckpointValue(checkpointTarget);
       }
 
       // advance world distance
@@ -3615,6 +4636,9 @@
       player.draw(ctx, pulse);
 
       ctx.restore();
+
+      // score celebrations (top-of-screen, non-blocking)
+      celebrations.draw(ctx);
 
       // UI text updates
       uiScore.textContent =
@@ -3786,6 +4810,10 @@
          score += worldSpeed * dt * CONFIG.scorePerUnit
        - Best score stored in localStorage key:
          "neon_dash_best"
+       - To reset best score
+            ->F12-> Console-> allow pasting -> 
+            localStorage.setItem("neon_dash_best", "0");
+            location.reload();
 
        WebAudio
        --------
